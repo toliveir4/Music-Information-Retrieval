@@ -3,7 +3,7 @@ http://mir.dei.uc.pt
 
 
 Dataset used in our IEEE TAFFC article:
-Panda, P., Malheiro, R. & Paiva, R. P. (2018). “Novel audio features for music emotion recognition”. IEEE Transactions on Affective Computing (accepted for publication).
+Panda, P., Malheiro, R. & Paiva, R. P. (2018). "Novel audio features for music emotion recognition". IEEE Transactions on Affective Computing (accepted for publication).
 
 - The dataset consists of:
  *) 900 ~30 second clips gathered from AllMusic API
