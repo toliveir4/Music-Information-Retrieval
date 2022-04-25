@@ -35,7 +35,7 @@ def normalization(top100):  # 2.1.2
 
 
 def saveFeatures(fileName, top100_N):  # 2.1.3
-    fileName.replace(".csv", "_normalized_data.csv")
+    fileName = fileName.replace(".csv", "_normalized_data.csv")
     np.savetxt(fileName, top100_N, fmt="%lf", delimiter=',')
 
     """# checando
@@ -55,16 +55,93 @@ def loadAudio(fileName, sr, mono):
 
 
 # --- Extract features
-def extracFeatures(y):  # 2.2.2
-    rms = librosa.feature.rms(y=y)
-    rms = rms[0, :]
-    # print(rms.shape)
-    times = librosa.times_like(rms)
-    plt.figure()
-    plt.plot(times, rms)
-    plt.xlabel('Time (s)')
-    plt.title('RMS')
-    plt.imshow()
+def extracFeatures():  # 2.2.2
+    if not os.path.isdir(audioDir):
+        print("Directory not found!")
+        return
+
+    warnings.filterwarnings("ignore")
+
+    # List of songs to extract features
+    files = os.listdir(audioDir)
+    files.sort()
+    numFiles = len(files)
+    allSongs = np.zeros((numFiles, 190))
+
+    # Extract features of each song
+    for i in range(numFiles):
+        features = []
+
+        # Song to extract
+        inFile = librosa.load(audioDir + files[i], sr=22050, mono=True)[0]
+
+        # Extract mfcc
+        mfcc = librosa.feature.mfcc(inFile, n_mfcc=13)
+        features.append(mfcc)
+
+        # Extract pectral centroid
+        spectral_centroid = librosa.feature.spectral_centroid(inFile)
+        features.append(spectral_centroid)
+
+        # Extract spectral bandwith
+        spectral_bandwidth = librosa.feature.spectral_bandwidth(inFile)
+        features.append(spectral_bandwidth)
+
+        # Extract spectral contrast
+        spectral_contrast = librosa.feature.spectral_contrast(inFile, n_bands=6)
+        features.append(spectral_contrast)
+
+        # Extract spectral flatness
+        spectral_flatness = librosa.feature.spectral_flatness(inFile)
+        features.append(spectral_flatness)
+
+        # Extract spectral rollof
+        spectral_rolloff = librosa.feature.spectral_rolloff(inFile)
+        features.append(spectral_rolloff)
+
+        # Extract F0
+        F0 = librosa.yin(inFile, fmin=20, fmax=11025)
+        features.append(F0)
+
+        # Extract rms
+        rms = librosa.feature.rms(inFile)
+        features.append(rms)
+
+        # Extract zero_crossing_rate
+        zero_crossing_rate = librosa.feature.zero_crossing_rate(inFile)
+        features.append(zero_crossing_rate)
+
+        # Extract tempo
+        tempo = librosa.beat.tempo(inFile)
+
+        allFeatures = np.array([])
+        for feature in features:
+            try:
+                r, _ = feature.shape
+            except:
+                r = feature.shape[0]
+                feature = feature.reshape((1, r), order='F')
+                r, _ = feature.shape
+
+            addFeature = np.zeros((r, 7))
+            for j in range(r):
+                mean = np.mean(feature[j, :])
+                stdDev = np.std(feature[j, :])
+                skew = st.skew(feature[j, :])
+                kurtosis = st.kurtosis(feature[j, :])
+                median = np.median(feature[j, :])
+                maxv = np.max(feature[j, :])
+                minv = np.min(feature[j, :])
+
+                addFeature[j, :] = np.array([mean, stdDev, skew, kurtosis, median, maxv, minv])
+
+            addFeature = addFeature.flatten()
+            allFeatures = np.append(allFeatures, addFeature)
+
+        allFeatures = np.append(allFeatures, tempo)
+        allSongs[i] = allFeatures
+
+    return allSongs
 
 
 if __name__ == "__main__":
@@ -76,6 +153,10 @@ if __name__ == "__main__":
     top100_N = normalization(top100)
     saveFeatures(featuresFile, top100_N)
 
+    audioDir = 'MER_audio_taffc_dataset/audios/'
+    allSongs = extracFeatures()
+
+    """
     # --- Load file
     audioFile = "MER_audio_taffc_dataset/audios/MT0000414517.mp3"
     sr = 22050  # sampling rate
@@ -83,7 +164,7 @@ if __name__ == "__main__":
     y, fs = loadAudio(audioFile, sr, mono)
 
     # --- Play Sound
-    sd.play(y, sr, blocking=False)
+    # sd.play(y, sr, blocking=False)
 
     # --- Plot sound waveform
     plt.figure()
@@ -97,4 +178,5 @@ if __name__ == "__main__":
     ax.set_title('Power spectrogram')
     fig.colorbar(img, ax=ax, format="%+2.0f dB")
 
-    plt.show()
+    # plt.show()
+    """
