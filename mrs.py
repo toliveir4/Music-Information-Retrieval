@@ -79,7 +79,7 @@ def extracFeatures():  # 2.2.2
         mfcc = librosa.feature.mfcc(inFile, n_mfcc=13)
         features.append(mfcc)
 
-        # Extract pectral centroid
+        # Extract spectral centroid
         spectral_centroid = librosa.feature.spectral_centroid(inFile)
         features.append(spectral_centroid)
 
@@ -153,8 +153,12 @@ if __name__ == "__main__":
     top100_N = normalization(top100)
     saveFeatures(featuresFile, top100_N)
 
+    # --- Ex2.2
     audioDir = 'MER_audio_taffc_dataset/audios/'
     allSongs = extracFeatures()
+
+    featuresFile = './Features - Audio MER/All_features.csv'
+    saveFeatures(featuresFile, allSongs)
 
     """
     # --- Load file
