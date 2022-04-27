@@ -12,38 +12,36 @@ import sounddevice as sd  # https://anaconda.org/conda-forge/python-sounddevice
 import warnings
 
 
-def readFeatures(fileName):  # 2
-    # 2.1
+def readFeatures(fileName):  # 2.1.1
     top100 = np.genfromtxt(fileName, delimiter=',')
     lines, columns = np.shape(top100)
-    #print("dim ficheiro top100_features.csv original = %d x %d\n\n" % (lines, columns), top100)
+    # print("dim ficheiro top100_features.csv original = %d x %d\n\n" % (lines, columns), top100)
     top100 = top100[1:, 1:(columns-1)]
     """lines, columns = np.shape(top100)
-    print("\ndim top100 data = %d x %d\n\n" % (lines, columns), top100)"""
+    print("\ndim top100 data = %d x %d\n\n" % (lines, columns), top100)
+    print()"""
     return top100
 
 
-def normalization(top100):  # 2.1.2
-    top100_N = np.zeros(np.shape(top100))
-    columns = np.shape(top100_N)[1]
+def normalization(features):  # 2.1.2
+    features_N = np.zeros(np.shape(features))
+    columns = np.shape(features_N)[1]
     for i in range(columns):
-        vmax = top100[:, i].max()
-        vmin = top100[:, i].min()
-        top100_N[:, i] = (top100[:, i] - vmin)/(vmax - vmin)
-    # print(top100_N)
-    return top100_N
+        vmax = features[:, i].max()
+        vmin = features[:, i].min()
+        features_N[:, i] = (features[:, i] - vmin)/(vmax - vmin)
+    # print(features_N)
+    return features_N
 
 
-def saveFeatures(fileName, top100_N):  # 2.1.3
-    fileName = fileName.replace(".csv", "_normalized_data.csv")
-    np.savetxt(fileName, top100_N, fmt="%lf", delimiter=',')
+def saveFeatures(fileName, features):  # 2.1.3
+    # np.savetxt(fileName, features, fmt="%lf", delimiter=',')
 
-    """# checando
-    top100_N = np.genfromtxt(fileName, delimiter=',')
-    lines, columns = top100_N.shape
-    print("dim ficheiro top100_features_normalized_data.csv = ", lines, "x", columns)
+    # checks if it's all good
+    features = np.genfromtxt(fileName, delimiter=',')
+    lines, columns = features.shape
+    print("dim ficheiro %s = %d x %d\n\n" % (fileName, lines, columns), features)
     print()
-    print(top100_N)"""
 
 
 def loadAudio(fileName, sr, mono):
@@ -64,7 +62,7 @@ def extracFeatures():  # 2.2.2
 
     # List of songs to extract features
     files = os.listdir(audioDir)
-    files.sort()
+    files.sort()    # sort the files alphabetically
     numFiles = len(files)
     allSongs = np.zeros((numFiles, 190))
 
@@ -148,41 +146,15 @@ if __name__ == "__main__":
     plt.close('all')
 
     # --- Ex2.1
-    featuresFile = './Features - Audio MER/top100_features.csv'
-    top100 = readFeatures(featuresFile)
+    top100File = './Features - Audio MER/top100_features.csv'
+    top100 = readFeatures(top100File)
+    top100File_N = top100File.replace('.csv', '_normalized_data.csv')
     top100_N = normalization(top100)
-    saveFeatures(featuresFile, top100_N)
+    saveFeatures(top100File_N, top100_N)
 
     # --- Ex2.2
     audioDir = 'MER_audio_taffc_dataset/audios/'
-    allSongs = extracFeatures()
-
-    allSongs_N = normalization(allSongs)
-
-    featuresFile = './Features - Audio MER/All_features.csv'
-    saveFeatures(featuresFile, allSongs_N)
-
-    """
-    # --- Load file
-    audioFile = "MER_audio_taffc_dataset/audios/MT0000414517.mp3"
-    sr = 22050  # sampling rate
-    mono = True
-    y, fs = loadAudio(audioFile, sr, mono)
-
-    # --- Play Sound
-    # sd.play(y, sr, blocking=False)
-
-    # --- Plot sound waveform
-    plt.figure()
-    librosa.display.waveshow(y)
-
-    # --- Plot spectrogram
-    Y = np.abs(librosa.stft(y))
-    Ydb = librosa.amplitude_to_db(Y, ref=np.max)
-    fig, ax = plt.subplots()
-    img = librosa.display.specshow(Ydb, y_axis='log', x_axis='time', ax=ax)
-    ax.set_title('Power spectrogram')
-    fig.colorbar(img, ax=ax, format="%+2.0f dB")
-
-    # plt.show()
-    """
+    # allSongs = extracFeatures()
+    # allSongs_N = normalization(allSongs)
+    allSongsFile_N = './Features - Audio MER/All_features_normalized_data.csv'
+    saveFeatures(allSongsFile_N, [])
