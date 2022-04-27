@@ -157,8 +157,10 @@ if __name__ == "__main__":
     audioDir = 'MER_audio_taffc_dataset/audios/'
     allSongs = extracFeatures()
 
+    allSongs_N = normalization(allSongs)
+
     featuresFile = './Features - Audio MER/All_features.csv'
-    saveFeatures(featuresFile, allSongs)
+    saveFeatures(featuresFile, allSongs_N)
 
     """
     # --- Load file
