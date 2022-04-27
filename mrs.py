@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import os
+import time
 import numpy as np
 import matplotlib.pyplot as plt
 import scipy.stats as st
@@ -40,7 +41,8 @@ def saveFeatures(fileName, features):  # 2.1.3
     # check if it's all good
     features = np.genfromtxt(fileName, delimiter=',')
     lines, columns = features.shape
-    print("dim ficheiro %s = %d x %d\n\n" % (fileName, lines, columns), features)
+    print("dim ficheiro %s = %d x %d\n\n" %
+          (fileName, lines, columns), features)
     print()
 
 
@@ -86,7 +88,8 @@ def extracFeatures():  # 2.2.2
         features.append(spectral_bandwidth)
 
         # Extract spectral contrast
-        spectral_contrast = librosa.feature.spectral_contrast(inFile, n_bands=6)
+        spectral_contrast = librosa.feature.spectral_contrast(
+            inFile, n_bands=6)
         features.append(spectral_contrast)
 
         # Extract spectral flatness
@@ -131,7 +134,8 @@ def extracFeatures():  # 2.2.2
                 maxv = np.max(feature[j, :])
                 minv = np.min(feature[j, :])
 
-                addFeature[j, :] = np.array([mean, stdDev, skew, kurtosis, median, maxv, minv])
+                addFeature[j, :] = np.array(
+                    [mean, stdDev, skew, kurtosis, median, maxv, minv])
 
             addFeature = addFeature.flatten()
             allFeatures = np.append(allFeatures, addFeature)
@@ -153,8 +157,11 @@ if __name__ == "__main__":
     saveFeatures(top100File_N, top100_N)
 
     # --- Ex2.2
+    start = time.time()
     audioDir = 'MER_audio_taffc_dataset/audios/'
     allSongs = extracFeatures()
     allSongs_N = normalization(allSongs)
     allSongsFile_N = './Features - Audio MER/All_features_normalized_data.csv'
-    saveFeatures(allSongsFile_N, [])
+    saveFeatures(allSongsFile_N, allSongs_N)
+    final = time.time() - start
+    print(f"\n\033[94mTIME: {final}\033[0m")
