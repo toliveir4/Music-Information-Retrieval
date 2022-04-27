@@ -35,9 +35,9 @@ def normalization(features):  # 2.1.2
 
 
 def saveFeatures(fileName, features):  # 2.1.3
-    # np.savetxt(fileName, features, fmt="%lf", delimiter=',')
+    np.savetxt(fileName, features, fmt="%lf", delimiter=',')
 
-    # checks if it's all good
+    # check if it's all good
     features = np.genfromtxt(fileName, delimiter=',')
     lines, columns = features.shape
     print("dim ficheiro %s = %d x %d\n\n" % (fileName, lines, columns), features)
@@ -154,7 +154,7 @@ if __name__ == "__main__":
 
     # --- Ex2.2
     audioDir = 'MER_audio_taffc_dataset/audios/'
-    # allSongs = extracFeatures()
-    # allSongs_N = normalization(allSongs)
+    allSongs = extracFeatures()
+    allSongs_N = normalization(allSongs)
     allSongsFile_N = './Features - Audio MER/All_features_normalized_data.csv'
     saveFeatures(allSongsFile_N, [])
