@@ -102,6 +102,7 @@ def extracFeatures():  # 2.2.2
 
         # Extract F0
         F0 = librosa.yin(inFile, fmin=20, fmax=11025)
+        F0[F0 == 11025] = 0
         features.append(F0)
 
         # Extract rms
