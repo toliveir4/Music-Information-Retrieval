@@ -11,6 +11,7 @@ import librosa.display
 import librosa.beat
 import sounddevice as sd  # https://anaconda.org/conda-forge/python-sounddevice
 import warnings
+from scipy.spatial import distance
 
 
 def readFeatures(fileName):  # 2.1.1
@@ -147,22 +148,182 @@ def extracFeatures():  # 2.2.2
     return allSongs
 
 
+def metricas_top100(filename):
+    feat = np.genfromtxt(filename, delimiter=",")
+    feat = feat[1:, 1:(feat.shape[1]-1)]
+
+    euclidiana = np.zeros((900, 900))
+    manhattan = np.zeros((900, 900))
+    cosseno = np.zeros((900, 900))
+
+    for i in range(900):
+        for j in range(i+1, 900):
+            euclidiana[i][j] = distance.euclidean(
+                feat[i, :], feat[j, :])
+            euclidiana[j][i] = euclidiana[i][j]
+            manhattan[i][j] = distance.cityblock(
+                feat[i, :], feat[j, :])
+            manhattan[j][i] = manhattan[i][j]
+            cosseno[i][j] = distance.cosine(feat[i, :], feat[j, :])
+            cosseno[j][i] = cosseno[i][j]
+
+    np.savetxt(euclidianaFile,
+               euclidiana, fmt="%f", delimiter=",")
+    np.savetxt(manhattanFile,
+               manhattan, fmt="%f", delimiter=",")
+    np.savetxt(cossenoFile,
+               cosseno, fmt="%f", delimiter=",")
+
+
+def metricas_normalizada(filename):
+    feat = np.genfromtxt(filename, delimiter=",")
+
+    for i in range(900):
+        for j in range(190):
+            if (np.isnan(feat[i][j])):
+                feat[i][j] = 0
+
+    euclidiana = np.zeros((900, 900))
+    manhattan = np.zeros((900, 900))
+    cosseno = np.zeros((900, 900))
+
+    for i in range(900):
+        for j in range(i+1, 900):
+            euclidiana[i][j] = distance.euclidean(
+                feat[i, :], feat[j, :])
+            euclidiana[j][i] = euclidiana[i][j]
+            manhattan[i][j] = distance.cityblock(
+                feat[i, :], feat[j, :])
+            manhattan[j][i] = manhattan[i][j]
+            cosseno[i][j] = distance.cosine(feat[i, :], feat[j, :])
+            cosseno[j][i] = cosseno[i][j]
+
+    np.savetxt(euclidiana_normalizada,
+               euclidiana, fmt="%f", delimiter=",")
+    np.savetxt(manhattan_normalizada,
+               manhattan, fmt="%f", delimiter=",")
+    np.savetxt(cosseno_normalizada,
+               cosseno, fmt="%f", delimiter=",")
+
+
+def similarity(filename, musica):
+    feat = np.genfromtxt(filename, delimiter=",")
+    return np.argsort(feat[musica][:])[1:21]
+
+
+def getMetadata(music):
+    metadataRawMatrix = np.genfromtxt(
+        'dataset/panda_dataset_taffc_metadata.csv', delimiter=',', dtype="str")
+    metadata = metadataRawMatrix[1:, [1, 3, 9, 11]]
+
+    metadataScores = np.zeros(900)
+    metadataScores[music] = -1
+    for i in range(metadata.shape[0]):
+        score = 0
+        if i == music:
+            continue
+        for j in range(metadata.shape[1]):
+            # teste para artista e quadrante:
+            if j < 2:
+                if metadata[music, j] == metadata[i, j]:
+                    score = score + 1
+            else:
+                # teste para MoodStrSplit e GenresStr
+                # retira as "" do começo e fim e separa no "; "
+                listA = metadata[music, j][1:-1].split('; ')
+                listB = metadata[i, j][1:-1].split('; ')
+                for e in listA:
+                    for ee in listB:
+                        if e == ee:
+                            score = score + 1
+        metadataScores[i] = score
+
+    top20 = []
+    aux = metadataScores.copy()
+
+    for i in range(20):
+        index = -1
+        m = -1
+        for j in range(900):
+            if aux[j] >= m:
+                m = aux[j]
+                index = j
+        # print(f"{metadataRawMatrix[index+1, 0]} -> {m}")
+        aux[index] = -1
+        top20.append(metadataRawMatrix[index+1, 0].replace("\"", "") + ".mp3")
+    
+    return metadataScores, top20
+
 if __name__ == "__main__":
     plt.close('all')
 
     # --- Ex2.1
-    top100File = './Features - Audio MER/top100_features.csv'
-    top100 = readFeatures(top100File)
-    top100File_N = top100File.replace('.csv', '_normalized_data.csv')
-    top100_N = normalization(top100)
-    saveFeatures(top100File_N, top100_N)
+    top100File = './Features/top100_features.csv'
+    # top100 = readFeatures(top100File)
+    # top100File_N = top100File.replace('.csv', '_normalized_data.csv')
+    # top100_N = normalization(top100)
+    # saveFeatures(top100File_N, top100_N)
 
     # --- Ex2.2
-    start = time.time()
-    audioDir = 'MER_audio_taffc_dataset/audios/'
-    allSongs = extracFeatures()
-    allSongs_N = normalization(allSongs)
-    allSongsFile_N = './Features - Audio MER/All_features_normalized_data.csv'
-    saveFeatures(allSongsFile_N, allSongs_N)
-    final = time.time() - start
-    print(f"\n\033[94mTIME: {final}\033[0m")
+    # start = time.time()
+    audioDir = 'dataset/audios/'
+    # allSongs = extracFeatures()
+    # allSongs_N = normalization(allSongs)
+    allSongsFile_N = './Features/All_features_normalized_data.csv'
+    # saveFeatures(allSongsFile_N, allSongs_N)
+    # final = time.time() - start
+    # print(f"\n\033[94mTIME: {final}\033[0m")
+
+    # --- Ex3
+    euclidianaFile = "./Features/euclidiana_top100.csv"
+    manhattanFile = "./Features/manhattan_top100.csv"
+    cossenoFile = "./Features/cosseno_top100.csv"
+
+    euclidiana_normalizada = "./Features/euclidiana_normalizada.csv"
+    manhattan_normalizada = "./Features/manhattan_normalizada.csv"
+    cosseno_normalizada = "./Features/cosseno_normalizada.csv"
+
+    files = os.listdir(audioDir)
+    files.sort()
+    songs = []
+    for i in range(len(files)):
+        if(files[i] == "MT0000202045.mp3" or files[i] == "MT0000379144.mp3" or files[i] == "MT0000414517.mp3" or files[i] == "MT0000956340.mp3"):
+            songs.append(int(i))
+
+    # metricas_top100(top100File)
+    # metricas_normalizada(allSongsFile_N)
+
+    top20_3 = []
+    with open("similarity.txt", "w") as f:
+        for i in [euclidianaFile, manhattanFile, cossenoFile,
+                  euclidiana_normalizada, manhattan_normalizada, cosseno_normalizada]:
+            for j in range(4):
+                index = similarity(i, songs[j])
+                file = i.split("/")
+                aux = []
+                for k in range(20):
+                    aux.append(files[index[k]])
+
+                f.write("\n" + files[songs[j]] + "\n")
+                f.write(aux.__str__())
+                f.write("\n")
+                top20_3.append(aux)
+
+    top20_4 = []
+    with open("metadataScores.txt", "w") as f:
+        for i in songs:
+            f.write("\nSEARCHING MATCHES FOR " + files[i] + "\n")
+            metadataScores, top20 = getMetadata(i)
+            f.write(metadataScores.__str__() + "\n")
+            f.write(f"\nTOP 20 FOR {files[i]}\n" + top20.__str__() + "\n")
+            f.write("----------------------------------------------------------------\n")
+            top20_4.append(top20)
+
+    for i in range(4):
+        count = 0
+        for j in range(20):
+            if top20_3[i][j] in top20_4[i]:
+                count += 1
+
+        precision = count / 20
+        print(f"Precision of {files[songs[i]]} -> {precision}")
