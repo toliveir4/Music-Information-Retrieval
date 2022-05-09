@@ -307,7 +307,7 @@ if __name__ == "__main__":
                     ff.write("\nSEARCHING MATCHES FOR " + files[song] + "\n")
                     ff.write(metadataScores.__str__() + "\n")
                     ff.write(
-                        f"\nTOP 20 FOR {files[song]} - {i}\n" + aux.__str__() + "\n")
+                        f"\nTOP 20 FOR {files[song]}\n" + aux.__str__() + "\n")
                     ff.write(
                         "----------------------------------------------------------------\n")
 
