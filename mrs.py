@@ -274,11 +274,9 @@ if __name__ == "__main__":
 
     files = os.listdir(audioDir)
     files.sort()
-    songs = []
-    for i in range(len(files)):
-        if(files[i] == "MT0000202045.mp3" or files[i] == "MT0000379144.mp3" or files[i] == "MT0000414517.mp3" or files[i] == "MT0000956340.mp3"):
-            songs.append(int(i))
-
+    songs = [files.index("MT0000202045.mp3"), files.index("MT0000379144.mp3"), files.index(
+        "MT0000414517.mp3"), files.index("MT0000956340.mp3")]
+    
     # metricas_top100(top100File)
     # metricas_normalizada(allSongsFile_N)
 
@@ -301,7 +299,6 @@ if __name__ == "__main__":
 
                 # --- Ex 4
                 metadataScores, top20 = getMetadata(song)
-
                 aux = []
                 for top in top20:
                     aux.append(files[top])
