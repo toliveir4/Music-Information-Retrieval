@@ -206,9 +206,9 @@ def metricas_normalizada(filename):
                cosseno, fmt="%f", delimiter=",")
 
 
-def similarity(filename, musica):
+def similarity(filename, music):
     feat = np.genfromtxt(filename, delimiter=",")
-    return np.argsort(feat[musica][:])[1:21]
+    return np.argsort(feat[music][:])[1:21]
 
 
 def getMetadata(music):
@@ -238,21 +238,10 @@ def getMetadata(music):
                             score = score + 1
         metadataScores[i] = score
 
-    top20 = []
-    aux = metadataScores.copy()
+    top20 = np.flip(np.argsort(metadataScores))[:20]
 
-    for i in range(20):
-        index = -1
-        m = -1
-        for j in range(900):
-            if aux[j] >= m:
-                m = aux[j]
-                index = j
-        # print(f"{metadataRawMatrix[index+1, 0]} -> {m}")
-        aux[index] = -1
-        top20.append(metadataRawMatrix[index+1, 0].replace("\"", "") + ".mp3")
-    
     return metadataScores, top20
+
 
 if __name__ == "__main__":
     plt.close('all')
@@ -293,37 +282,40 @@ if __name__ == "__main__":
     # metricas_top100(top100File)
     # metricas_normalizada(allSongsFile_N)
 
-    top20_3 = []
-    with open("similarity.txt", "w") as f:
+    with open("similarity.txt", "w") as f, open("metadataScores.txt", "w") as ff:
         for i in [euclidianaFile, manhattanFile, cossenoFile,
                   euclidiana_normalizada, manhattan_normalizada, cosseno_normalizada]:
-            for j in range(4):
-                index = similarity(i, songs[j])
-                file = i.split("/")
+
+            top20_3, top20_4 = [], []
+
+            for song in songs:
+                index = similarity(i, song)
                 aux = []
                 for k in range(20):
                     aux.append(files[index[k]])
 
-                f.write("\n" + files[songs[j]] + "\n")
+                f.write("\n" + files[song] + "\n")
                 f.write(aux.__str__())
                 f.write("\n")
                 top20_3.append(aux)
 
-    top20_4 = []
-    with open("metadataScores.txt", "w") as f:
-        for i in songs:
-            f.write("\nSEARCHING MATCHES FOR " + files[i] + "\n")
-            metadataScores, top20 = getMetadata(i)
-            f.write(metadataScores.__str__() + "\n")
-            f.write(f"\nTOP 20 FOR {files[i]}\n" + top20.__str__() + "\n")
-            f.write("----------------------------------------------------------------\n")
-            top20_4.append(top20)
+                # --- Ex 4
+                metadataScores, top20 = getMetadata(song)
 
-    for i in range(4):
-        count = 0
-        for j in range(20):
-            if top20_3[i][j] in top20_4[i]:
-                count += 1
+                aux = []
+                for top in top20:
+                    aux.append(files[top])
 
-        precision = count / 20
-        print(f"Precision of {files[songs[i]]} -> {precision}")
+                if i == euclidianaFile:  # prevents writing the same in the file
+                    ff.write("\nSEARCHING MATCHES FOR " + files[song] + "\n")
+                    ff.write(metadataScores.__str__() + "\n")
+                    ff.write(
+                        f"\nTOP 20 FOR {files[song]} - {i}\n" + aux.__str__() + "\n")
+                    ff.write(
+                        "----------------------------------------------------------------\n")
+
+                top20_4.append(aux)
+
+            for k in range(4):
+                precision = len(np.intersect1d(top20_3[k], top20_4[k])) / 20
+                print(f"Precision of {files[songs[k]]} - {i} -> {precision}")
