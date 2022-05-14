@@ -283,7 +283,7 @@ if __name__ == "__main__":
     with open("similarity.txt", "w") as f, open("metadataScores.txt", "w") as ff:
         for i in [euclidianaFile, manhattanFile, cossenoFile,
                   euclidiana_normalizada, manhattan_normalizada, cosseno_normalizada]:
-
+            f.write(f"---------- {i} ----------\n")
             top20_3, top20_4 = [], []
 
             for song in songs:
@@ -292,9 +292,9 @@ if __name__ == "__main__":
                 for k in range(20):
                     aux.append(files[index[k]])
 
-                f.write("\n" + files[song] + "\n")
+                f.write(f"{files[song]}\n")
                 f.write(aux.__str__())
-                f.write("\n")
+                f.write("\n\n")
                 top20_3.append(aux)
 
                 # --- Ex 4
