@@ -290,10 +290,11 @@ if __name__ == "__main__":
                 index = similarity(i, song)
                 aux = []
                 for k in range(20):
-                    aux.append(files[index[k]])
+                    aux.append(files[index[k]].replace(".mp3", ""))
 
                 f.write(f"{files[song]}\n")
-                f.write(aux.__str__())
+                for a in aux:
+                    f.write(f"{a} | ")
                 f.write("\n\n")
                 top20_3.append(aux)
 
@@ -301,15 +302,17 @@ if __name__ == "__main__":
                 metadataScores, top20 = getMetadata(song)
                 aux = []
                 for top in top20:
-                    aux.append(files[top])
+                    aux.append(files[top].replace(".mp3", ""))
 
                 if i == euclidianaFile:  # prevents writing the same in the file
                     ff.write("\nSEARCHING MATCHES FOR " + files[song] + "\n")
                     ff.write(metadataScores.__str__() + "\n")
+                    ff.write(f"\nTOP 20 FOR {files[song]}\n")
+                    for a in aux:
+                        ff.write(f"{a} | ")
+                    
                     ff.write(
-                        f"\nTOP 20 FOR {files[song]}\n" + aux.__str__() + "\n")
-                    ff.write(
-                        "----------------------------------------------------------------\n")
+                        "\n----------------------------------------------------------------\n")
 
                 top20_4.append(aux)
 
