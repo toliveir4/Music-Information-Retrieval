@@ -1,8 +1,8 @@
 # __Music Information Retrieval__
 
-## __Report__
+## __Relatório__
 
-__Done by:__
+__Feito por:__
 
 - Marco Pais - Nº 2019218
 - Tiago Oliveira - Nº 2019219068
@@ -124,6 +124,39 @@ similaridade:
 
 <br>
 
+#### __Euclidiana: Librosa__ - __MT0000202045__
+
+||||||
+|:--:|:--:|:--:|:--:|:--:|
+| MT0005129157 | MT0011899302 | MT0012001409 | MT0002233402 | MT0007043504 |
+| MT0007799677 | MT0004428604 | MT0002161109 | MT0011975274 | MT0010624346 |
+| MT0009217411 | MT0000092267 | MT0007766156 | MT0001676671 | MT0005270263 |
+| MT0003787478 | MT0011376343 | MT0005213723 | MT0000732821 | MT0002634024 |
+
+#### __Manhattan: Librosa__ - __MT0000202045__
+
+||||||
+|:--:|:--:|:--:|:--:|:--:|
+| MT0005129157 | MT0011899302 | MT0012001409 | MT0007799677 | MT0002233402 |
+| MT0007043504 | MT0010624346 | MT0000732821 | MT0011975274 | MT0004428604 |
+| MT0000092267 | MT0003787478 | MT0002161109 | MT0009217411 | MT0002379222 |
+| MT0002634024 | MT0005213723 | MT0011376343 | MT0036368550 | MT0000446304 |
+
+#### __Cosseno: Librosa__ - __MT0000202045__
+
+||||||
+|:--:|:--:|:--:|:--:|:--:|
+| MT0005129157 | MT0012001409 | MT0011899302 | MT0002233402 | MT0007043504 |
+| MT0007799677 | MT0004428604 | MT0011975274 | MT0002161109 | MT0000092267 |
+| MT0010624346 | MT0009217411 | MT0007766156 | MT0003787478 | MT0010085729 |
+| MT0005270263 | MT0001676671 | MT0000732821 | MT0005213723 | MT0026158301 |
+
+<br>
+
+> Ao analisar os resultados dos diversos top20 obtidos pode-se verificar que as músicas primeiras músicas são iguais para as 3 distâncias e o com afastamento dessas primeiras músicas é verificado que as músicas são cada vez mais distintas.
+>
+> Visto que os resultados não foram os mais satisfatórios, uma forma de os melhorar passaria pela escolha de outro conjunto de *Features* e de distâncias para o cálculo da similaridade entre as músicas.
+
 ### __4. Avaliação__
 
 - 4.1. Avaliação objectiva.
@@ -146,6 +179,21 @@ similaridade:
 | MT0003025046 | MT0005285696 | MT0002846256 | MT0001058887 | MT0007766156 |
 
 <br>
+
+| | Precision of MT0000202045.mp3 | Precision of MT0000379144.mp3 | Precision of MT0000414517.mp3 | Precision of MT0000956340.mp3 |
+|:--:|:--:|:--:|:--:|:--:|
+| euclidiana_top100.csv | 0.0 | 0.0 | 0.05 | 0.05 |
+| manhattan_top100.csv | 0.0 | 0.0 | 0.05 | 0.05 |
+| cosseno_top100.csv | 0.0 | 0.0 | 0.05 | 0.05 |
+| euclidiana_normalizada.csv | 0.05 | 0.0 | 0.15 | 0.0 |
+| manhattan_normalizada.csv | 0.0 | 0.0 | 0.1 | 0.0 |
+| cosseno_normalizada.csv | 0.05 | 0.0 | 0.1 | 0.0 |
+
+<br>
+
+> Analisando os resultados obtidos no cálculo das precisões é possível verificar que as precisões são todas muito baixas, sendo o valor mais alto 0.15.
+>
+> Os valores mais altos de precisão podem ser encontrados na música __MT0000414517.mp3__. Em contraste com a música MT0000414517.mp3, a música __MT0000379144.mp3__ apresenta sempre valores de precisão nulos, ou seja, não existe qualquer *match* entre o top20 gerado pelos metadados e os top20 gerados pelas várias distâncias.
 
 - 4.2. Avaliação subjectiva.
 
@@ -195,6 +243,7 @@ precision resultante e actualizar o valor da F-measure.
 |:--:|:--:|
 | __Média Total__ | 2 |
 | __Desvio Padrão Total__ | 0,7245688373 |
+| __Precisão__ | 5/20 |
 
 <br>
 
@@ -227,6 +276,7 @@ precision resultante e actualizar o valor da F-measure.
 |:--:|:--:|
 | __Média Total__ | 1,95 |
 | __Desvio Padrão Total__ | 0,8426149773 |
+| __Precisão__ | 6/20 |
 
 <br>
 
@@ -259,6 +309,7 @@ precision resultante e actualizar o valor da F-measure.
 |:--:|:--:|
 | __Média Total__ | 1,9875 |
 | __Desvio Padrão Total__ | 0,825284042 |
+| __Precisão__ | 6/20 |
 
 <br>
 
@@ -291,5 +342,10 @@ precision resultante e actualizar o valor da F-measure.
 |:--:|:--:|
 | __Média Total__ | 1,65 |
 | __Desvio Padrão Total__ | 0,916515139 |
+| __Precisão__ | 3/20 |
 
 <br>
+
+> Através da análise objetiva seria de esperar que na análise subjetiva as músicas __MT0000202045__ e __MT0000379144__ apresentassem valores de precisão mais baixos que as restantes músicas. No entanto, isso não se verificou, tendo até valores de precisão equiparáveis à música __MT0000414517__.
+>
+> Essa diferença nos resultados deve-se ao facto de termos sido nós a escolher as músicas relevantes ao contrário da alínea anterior em que estas eram as músicas com os metadados mais semelhantes aos das queries.
